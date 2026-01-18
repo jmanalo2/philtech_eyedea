@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -34,7 +34,7 @@ export default function CIEvaluationPanel({ idea, onEvaluationComplete }) {
 
   const fetchTechPersons = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/admin/tech-persons`);
+      const response = await api.get('/api/admin/tech-persons');
       setTechPersons(response.data);
     } catch (error) {
       console.error('Failed to fetch tech persons:', error);
@@ -44,7 +44,7 @@ export default function CIEvaluationPanel({ idea, onEvaluationComplete }) {
   const handleMarkAsBestIdea = async () => {
     setMarkingBest(true);
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/ideas/${idea.id}/mark-best-idea`);
+      await api.post(`/api/ideas/${idea.id}/mark-best-idea`);
       toast.success('This Eye-dea has been marked as the Best Eye-dea!');
       onEvaluationComplete();
     } catch (error) {
@@ -67,7 +67,7 @@ export default function CIEvaluationPanel({ idea, onEvaluationComplete }) {
   const handleImplemented = async () => {
     setSubmitting(true);
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/ideas/${idea.id}/ci-evaluate`, {
+      await api.post(`/api/ideas/${idea.id}/ci-evaluate`, {
         is_quick_win: true,
         complexity_level: null,
         savings_type: null,
@@ -100,7 +100,7 @@ export default function CIEvaluationPanel({ idea, onEvaluationComplete }) {
 
     setSubmitting(true);
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/ideas/${idea.id}/ci-evaluate`, evaluation);
+      await api.post(`/api/ideas/${idea.id}/ci-evaluate`, evaluation);
       toast.success('Evaluation saved successfully!');
       onEvaluationComplete();
     } catch (error) {

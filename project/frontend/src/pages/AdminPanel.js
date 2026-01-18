@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -34,11 +34,11 @@ export default function AdminPanel() {
   const fetchAllData = async () => {
     try {
       const [usersRes, deptsRes, pillarsRes, teamsRes, techRes] = await Promise.all([
-        axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/admin/users`),
-        axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/admin/departments`),
-        axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/admin/pillars`),
-        axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/admin/teams`),
-        axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/admin/tech-persons`)
+        api.get('/api/admin/users'),
+        api.get('/api/admin/departments'),
+        api.get('/api/admin/pillars'),
+        api.get('/api/admin/teams'),
+        api.get('/api/admin/tech-persons')
       ]);
       setUsers(usersRes.data);
       setDepartments(deptsRes.data);
@@ -53,7 +53,7 @@ export default function AdminPanel() {
   const handleUpdateUser = async () => {
     if (!editingUser) return;
     try {
-      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/admin/users/${editingUser.id}`, {
+      await api.put(`/api/admin/users/${editingUser.id}`, {
         username: editingUser.username,
         email: editingUser.email,
         role: editingUser.role,
@@ -76,7 +76,7 @@ export default function AdminPanel() {
   const handleDeleteUser = async (userId) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/admin/users/${userId}`);
+      await api.delete(`/api/admin/users/${userId}`);
       toast.success('User deleted');
       fetchAllData();
     } catch (error) {
@@ -93,8 +93,8 @@ export default function AdminPanel() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/admin/users/bulk-upload`,
+      const response = await api.post(
+        '/api/admin/users/bulk-upload',
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
@@ -130,7 +130,7 @@ export default function AdminPanel() {
   const handleAddDepartment = async () => {
     if (!newDepartment.name.trim() || !newDepartment.pillar) return;
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/admin/departments`, newDepartment);
+      await api.post('/api/admin/departments', newDepartment);
       toast.success('Department added');
       setNewDepartment({ name: '', pillar: '' });
       fetchAllData();
@@ -142,7 +142,7 @@ export default function AdminPanel() {
   const handleDeleteDepartment = async (deptId) => {
     if (!window.confirm('Are you sure?')) return;
     try {
-      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/admin/departments/${deptId}`);
+      await api.delete(`/api/admin/departments/${deptId}`);
       toast.success('Department deleted');
       fetchAllData();
     } catch (error) {
@@ -153,7 +153,7 @@ export default function AdminPanel() {
   const handleAddPillar = async () => {
     if (!newPillar.trim()) return;
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/admin/pillars`, { name: newPillar });
+      await api.post('/api/admin/pillars', { name: newPillar });
       toast.success('Pillar added');
       setNewPillar('');
       fetchAllData();
@@ -165,7 +165,7 @@ export default function AdminPanel() {
   const handleDeletePillar = async (pillarId) => {
     if (!window.confirm('Are you sure?')) return;
     try {
-      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/admin/pillars/${pillarId}`);
+      await api.delete(`/api/admin/pillars/${pillarId}`);
       toast.success('Pillar deleted');
       fetchAllData();
     } catch (error) {
@@ -176,7 +176,7 @@ export default function AdminPanel() {
   const handleAddTeam = async () => {
     if (!newTeam.name.trim() || !newTeam.pillar || !newTeam.department) return;
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/admin/teams`, newTeam);
+      await api.post('/api/admin/teams', newTeam);
       toast.success('Team added');
       setNewTeam({ name: '', pillar: '', department: '' });
       fetchAllData();
@@ -188,7 +188,7 @@ export default function AdminPanel() {
   const handleDeleteTeam = async (teamId) => {
     if (!window.confirm('Are you sure?')) return;
     try {
-      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/admin/teams/${teamId}`);
+      await api.delete(`/api/admin/teams/${teamId}`);
       toast.success('Team deleted');
       fetchAllData();
     } catch (error) {
@@ -199,7 +199,7 @@ export default function AdminPanel() {
   const handleAddTechPerson = async () => {
     if (!newTechPerson.name.trim()) return;
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/admin/tech-persons`, newTechPerson);
+      await api.post('/api/admin/tech-persons', newTechPerson);
       toast.success('Tech & Engineering person added');
       setNewTechPerson({ name: '', email: '', specialization: '' });
       fetchAllData();
@@ -211,7 +211,7 @@ export default function AdminPanel() {
   const handleDeleteTechPerson = async (personId) => {
     if (!window.confirm('Are you sure?')) return;
     try {
-      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/admin/tech-persons/${personId}`);
+      await api.delete(`/api/admin/tech-persons/${personId}`);
       toast.success('Tech person deleted');
       fetchAllData();
     } catch (error) {
@@ -221,7 +221,7 @@ export default function AdminPanel() {
 
   const handleSeedData = async () => {
     try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/admin/seed-data`);
+      await api.post('/api/admin/seed-data');
       toast.success('Sample data seeded successfully');
       fetchAllData();
     } catch (error) {
